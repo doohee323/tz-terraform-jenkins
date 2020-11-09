@@ -58,7 +58,14 @@
 	$> terraform init
 ```
 
-## 4. run terraform-apply in jenkins
+## 4. fix backend.tf in vagrant
+```
+	It should be run in vagrant.
+	vagrant ssh
+	sudo bash /vagrant/jenkins-env/scripts/backend.sh
+```
+
+## 5. run terraform-apply in jenkins
 ```
 	It deploy the app to the instance(s) with terraform.
 
