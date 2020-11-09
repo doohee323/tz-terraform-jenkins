@@ -42,6 +42,10 @@ if [ ! -f "/home/vagrant/.aws/credentials" ]; then
 
 fi 
 
+rm -Rf .terraform
+rm -Rf terraform.tfstate
+rm -Rf terraform.tfstate.backup
+
 ############################################################
 ## make a ssh key
 ############################################################
@@ -66,20 +70,14 @@ Host JENKINS_IP
   UserKnownHostsFile      /dev/null
   IdentitiesOnly yes
 ' >> ~/.ssh/config
-
 sed -i "s|JENKINS_IP|${jenkins_ip}|g" ~/.ssh/config
-jenkins_key=`ssh -i mykey ubuntu@${jenkins_ip} "sudo cat /var/lib/jenkins/secrets/initialAdminPassword"`
-
-echo ############################################################
-echo $s3_bucket_id
-echo $jenkins_ip
-echo "Jenkins url: http://${jenkins_ip}:8080/"
-echo "jenkins_key: ${jenkins_key}"
-echo ############################################################
 
 cp -Rf backend.tf_imsi  backend.tf
 #sed -i "s|XXXX|${s3_bucket_id}|g" backend.tf
 terraform init
+
+echo "wait 60 seconds."
+sleep 60
 
 ############################################################
 ## make two jenkins projects
@@ -94,10 +92,15 @@ ssh -i mykey ubuntu@${jenkins_ip} "sudo /bin/bash jenkins-projects.sh packer-bui
 scp -i mykey resource/terraform-apply.xml ubuntu@${jenkins_ip}:/home/ubuntu/config.xml
 ssh -i mykey ubuntu@${jenkins_ip} "sudo /bin/bash jenkins-projects.sh terraform-apply"
 
-service jenkins restart
+ssh -i mykey ubuntu@${jenkins_ip} "sudo service jenkins restart"
 
+jenkins_key=`ssh -i mykey ubuntu@${jenkins_ip} "sudo cat /var/lib/jenkins/secrets/initialAdminPassword"`
 
-
-
-
+echo ############################################################
+echo $s3_bucket_id
+echo $jenkins_ip
+echo "Jenkins url: http://${jenkins_ip}:8080/"
+echo "jenkins_key: ${jenkins_key}"
+echo "ssh -i mykey ubuntu@${jenkins_ip}"
+echo ############################################################
 
