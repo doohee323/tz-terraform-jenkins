@@ -56,24 +56,24 @@ terraform init
 terraform apply -auto-approve
 
 s3_bucket_id=`terraform output | grep s3-bucket | awk '{print $3}'`
-app_ip=`terraform output | grep -A 2 "jenkins-ip" | tail -n 1`
-app_ip=`echo $app_ip | sed -e 's/\"//g;s/ //;s/,//'`
+jenkins_ip=`terraform output | grep -A 2 "jenkins-ip" | tail -n 1`
+jenkins_ip=`echo $jenkins_ip | sed -e 's/\"//g;s/ //;s/,//'`
 
 echo '
-Host APP_IP
+Host JENKINS_IP
   StrictHostKeyChecking   no
   LogLevel                ERROR
   UserKnownHostsFile      /dev/null
   IdentitiesOnly yes
 ' >> ~/.ssh/config
 
-sed -i "s|APP_IP|${app_ip}|g" ~/.ssh/config
-jenkins_key=`ssh -i mykey ubuntu@${app_ip} "sudo cat /var/lib/jenkins/secrets/initialAdminPassword"`
+sed -i "s|JENKINS_IP|${jenkins_ip}|g" ~/.ssh/config
+jenkins_key=`ssh -i mykey ubuntu@${jenkins_ip} "sudo cat /var/lib/jenkins/secrets/initialAdminPassword"`
 
 echo ############################################################
 echo $s3_bucket_id
-echo $app_ip
-echo "Jenkins url: http://${app_ip}:8080/"
+echo $jenkins_ip
+echo "Jenkins url: http://${jenkins_ip}:8080/"
 echo "jenkins_key: ${jenkins_key}"
 echo ############################################################
 
@@ -86,13 +86,13 @@ terraform init
 ## 1. packer-build -> app build and make an ami
 ## 2. terraform-apply -> make instance and deploy app
 ############################################################
-scp -i mykey scripts/jenkins-projects.sh ubuntu@${app_ip}:/home/ubuntu
+scp -i mykey scripts/jenkins-projects.sh ubuntu@${jenkins_ip}:/home/ubuntu
 
-scp -i mykey resource/packer-build.xml ubuntu@${app_ip}:/home/ubuntu/config.xml
-ssh -i mykey ubuntu@${app_ip} "sudo /bin/bash jenkins-projects.sh packer-build"
+scp -i mykey resource/packer-build.xml ubuntu@${jenkins_ip}:/home/ubuntu/config.xml
+ssh -i mykey ubuntu@${jenkins_ip} "sudo /bin/bash jenkins-projects.sh packer-build"
 
-scp -i mykey resource/terraform-apply.xml ubuntu@${app_ip}:/home/ubuntu/config.xml
-ssh -i mykey ubuntu@${app_ip} "sudo /bin/bash jenkins-projects.sh terraform-apply"
+scp -i mykey resource/terraform-apply.xml ubuntu@${jenkins_ip}:/home/ubuntu/config.xml
+ssh -i mykey ubuntu@${jenkins_ip} "sudo /bin/bash jenkins-projects.sh terraform-apply"
 
 service jenkins restart
 

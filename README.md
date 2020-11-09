@@ -1,42 +1,64 @@
 # tz-terraform-jenkins
 
-## 1. make and run packer-build in jenkins
+## 1. make a working vm in vagrant
 ```
-packer-build
-https://github.com/doohee323/packer-build.git
-bash jenkins-terraform.sh
+	scripts/install.sh
+	
+	install terraform, packer etc
+
 ```
 
-## 2. get S3 bucket name
+## 2. make jenkins env.
 ```
-$> terraform output
-app-ip = [
-  [],
-]
-jenkins-ip = [
-  [
-    "54.151.105.137",
-  ],
-]
-s3-bucket = terraform-state-k2vuvkxc
+	- make aws credentials
+	- make a ssh key
+	- make a jenkins instance in aws
+	- make two jenkins projects
+
+	ex) http://54.219.182.238:8080
+
+```
+
+## 2. run packer-build in jenkins
+```
+	ex) http://54.219.182.238:8080/job/packer-build/configure
+	packer-build
+	https://github.com/doohee323/tz-terraform-jenkins.git
+	cd ${WORKSPACE}/packer-build
+	bash jenkins-terraform.sh
 ```
 
 ## 3. uncomment backend.tf and rename bucket from terraform output
 ```
-terraform {
-  backend "s3" {
-    bucket = "terraform-state-k2vuvkxc"
-    key    = "terraform.tfstate"
-    region = "us-west-1"
-  }
-}
-$> terraform init
+	terraform {
+	  backend "s3" {
+	    bucket = "XXXX"
+	    key    = "terraform.tfstate"
+	    region = "us-west-1"
+	  }
+	}
+	$> terraform init
 ```
 
-## 4. make a jenkins project, terraform-apply
+## 4. run terraform-apply
 ```
-terraform-apply
-https://github.com/doohee323/terraform-course.git
-bash jenkins-packer-build/scripts/jenkins-run-terraform.sh
-and build terraform-apply project.
+	ex) http://54.219.182.238:8080/job/terraform-apply/configure
+	terraform-apply
+	https://github.com/doohee323/tz-terraform-jenkins.git
+	cd ${WORKSPACE}/jenkins-env/scripts
+	bash jenkins-run-terraform.sh
+```
+
+
+## 5 destroy aws resources
+```
+	vagrant ssh
+	sudo su
+	cd /vagrant/jenkins-env
+	terraform destroy
+	
+	
+	Need to delete s3 bucket and ami manually.
+	
+
 ```
