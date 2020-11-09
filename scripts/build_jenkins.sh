@@ -83,14 +83,11 @@ echo "##[ Summary ]##########################################################"
 echo "s3_bucket_id:" $s3_bucket_id
 echo "jenkins_ip:" $jenkins_ip
 echo "Jenkins url: http://${jenkins_ip}:8080/"
-echo "copy and paste this jenkins_key in the Jenkins url."
-echo "jenkins_key: ${jenkins_key}"
-echo ""
-echo "Access to aws ec2 in /vagrant/jenkins-env"
-echo "ssh -i mykey ubuntu@${jenkins_ip}"
-echo ""
+echo "Copy and paste this jenkins_key in the Jenkins url: ${jenkins_key}"
 echo "Now just run these projects in jenkins like in README.md."
 echo "3. run packer-build in jenkins"
 echo "4. run terraform-apply in jenkins"
+echo ""
+echo "Access to aws ec2 in /vagrant/jenkins-env: ssh -i mykey ubuntu@${jenkins_ip}"
 echo "#######################################################################"
 

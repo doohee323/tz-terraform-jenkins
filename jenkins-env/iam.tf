@@ -29,7 +29,7 @@ resource "aws_iam_role_policy" "admin-policy" {
 
   policy = <<-EOF
   {
-    "Version": "2012-10-17",
+    "Version": "2012-10-16",
     "Statement": [
       {
         "Action": [
