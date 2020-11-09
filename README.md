@@ -7,6 +7,7 @@
 	terraform-user with terraform-administrator group
 
 	-. set aws configuration
+	cf. This env. works only in us-west-1.
 	vi jenkins-env/resource/aws/config
 	vi jenkins-env/resource/aws/credentials
 
@@ -33,16 +34,16 @@
 
 ```
 
-## 3. run build-app in jenkins
+## 3. run packer-build in jenkins
 ```
 	It make an AMI with packer after building app.
 
-	ex) http://54.219.182.238:8080/job/build-app/configure
-	- Project Name: build-app
+	ex) http://54.219.182.238:8080/job/packer-build/configure
+	- Project Name: packer-build
 	- Git Repository URL: https://github.com/doohee323/tz-terraform-jenkins.git
 	- Branches to build: */master
 	- Build > Execute shell > Command
-		cd ${WORKSPACE}/build-app
+		cd ${WORKSPACE}/packer-build
 		bash jenkins-terraform.sh
 
     # fyi, shells run this automatically,
@@ -77,6 +78,8 @@
 	cd /vagrant/jenkins-env
 	terraform destroy
 	
-	Need to delete s3 bucket and ami manually.
+	Need to delete s3 bucket and AMI manually or might need to remove these,
+	- mykeypair in Key pairs
+	- jenkins-role in IAM Roles
 
 ```

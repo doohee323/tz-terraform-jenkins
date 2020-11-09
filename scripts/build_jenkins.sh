@@ -59,18 +59,18 @@ cp -Rf backend.tf_imsi  backend.tf
 #sed -i "s|XXXX|${s3_bucket_id}|g" backend.tf
 terraform init
 
-echo "wait 2 minutes."
-sleep 240
+echo "Wait about 2 minutes."
+sleep 200
 
 ############################################################
 ## make two jenkins projects
-## 1. build-app -> app build and make an ami
+## 1. packer-build -> app build and make an ami
 ## 2. terraform-apply -> make instance and deploy app
 ############################################################
 scp -i mykey scripts/jenkins-projects.sh ubuntu@${jenkins_ip}:/home/ubuntu
 
-scp -i mykey resource/build-app.xml ubuntu@${jenkins_ip}:/home/ubuntu/config.xml
-ssh -i mykey ubuntu@${jenkins_ip} "sudo /bin/bash jenkins-projects.sh build-app"
+scp -i mykey resource/packer-build.xml ubuntu@${jenkins_ip}:/home/ubuntu/config.xml
+ssh -i mykey ubuntu@${jenkins_ip} "sudo /bin/bash jenkins-projects.sh packer-build"
 
 scp -i mykey resource/terraform-apply.xml ubuntu@${jenkins_ip}:/home/ubuntu/config.xml
 ssh -i mykey ubuntu@${jenkins_ip} "sudo /bin/bash jenkins-projects.sh terraform-apply"
@@ -85,7 +85,7 @@ echo "jenkins_ip:" $jenkins_ip
 echo "Jenkins url: http://${jenkins_ip}:8080/"
 echo "Copy and paste this jenkins_key in the Jenkins url: ${jenkins_key}"
 echo "Now just run these projects in jenkins like in README.md."
-echo "3. run build-app in jenkins"
+echo "3. run packer-build in jenkins"
 echo "4. run terraform-apply in jenkins"
 echo ""
 echo "Access to aws ec2 in /vagrant/jenkins-env: ssh -i mykey ubuntu@${jenkins_ip}"
