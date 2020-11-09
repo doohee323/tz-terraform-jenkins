@@ -47,7 +47,7 @@ fi
 ############################################################
 ssh-keygen -t rsa -C mykey -P "" -f mykey -q
 
-rm -Rf backend2.tf
+rm -Rf backend.tf
 
 ############################################################
 ## make a jenkins instance in aws
@@ -68,7 +68,7 @@ Host APP_IP
 ' >> ~/.ssh/config
 
 sed -i "s|APP_IP|${app_ip}|g" ~/.ssh/config
-jenkins_key=`ssh -i mykey ubuntu@54.219.182.238 "sudo cat /var/lib/jenkins/secrets/initialAdminPassword"`
+jenkins_key=`ssh -i mykey ubuntu@${app_ip} "sudo cat /var/lib/jenkins/secrets/initialAdminPassword"`
 
 echo ############################################################
 echo $s3_bucket_id
@@ -77,9 +77,22 @@ echo "Jenkins url: http://${app_ip}:8080/"
 echo "jenkins_key: ${jenkins_key}"
 echo ############################################################
 
-packer-build
-https://github.com/doohee323/tz-terraform-jenkins.git
-echo "==========="
+cp -Rf backend.tf_imsi  backend.tf
+#sed -i "s|XXXX|${s3_bucket_id}|g" backend.tf
+terraform init
 
-bash packer-build/jenkins-terraform.sh
+scp -i mykey scripts/jenkins-projects.sh ubuntu@${app_ip}:/home/ubuntu
+
+scp -i mykey resource/packer-build.xml ubuntu@${app_ip}:/home/ubuntu/config.xml
+ssh -i mykey ubuntu@${app_ip} "sudo /bin/bash jenkins-projects.sh packer-build"
+
+scp -i mykey resource/terraform-apply.xml ubuntu@${app_ip}:/home/ubuntu/config.xml
+ssh -i mykey ubuntu@${app_ip} "sudo /bin/bash jenkins-projects.sh terraform-apply"
+
+service jenkins restart
+
+
+
+
+
 
