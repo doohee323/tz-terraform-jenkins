@@ -81,6 +81,11 @@ cp -Rf backend.tf_imsi  backend.tf
 #sed -i "s|XXXX|${s3_bucket_id}|g" backend.tf
 terraform init
 
+############################################################
+## make two jenkins projects
+## 1. packer-build -> app build and make an ami
+## 2. terraform-apply -> make instance and deploy app
+############################################################
 scp -i mykey scripts/jenkins-projects.sh ubuntu@${app_ip}:/home/ubuntu
 
 scp -i mykey resource/packer-build.xml ubuntu@${app_ip}:/home/ubuntu/config.xml

@@ -3,11 +3,6 @@ set -ex
 
 AWS_REGION="us-west-1"
 
-cd ..
-echo "aaaaaa"
-pwd
-
-
 S3_BUCKET=`aws s3 ls --region $AWS_REGION |grep terraform-state |tail -n1 |cut -d ' ' -f3`
 sed -i 's/XXXX/'${S3_BUCKET}'/' backend.tf
 sed -i 's/#//g' backend.tf

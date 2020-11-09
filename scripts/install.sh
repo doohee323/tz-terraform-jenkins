@@ -51,3 +51,11 @@ P_RETVAL=$?
 if [ ! ${REDHAT_BASED} ] ; then
   apt-get clean
 fi
+
+############################################################
+## build jenkins env.
+############################################################
+bash build_jenkins.sh
+
+
+
