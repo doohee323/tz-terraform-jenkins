@@ -35,6 +35,8 @@
 
 ## 3. run build-app in jenkins
 ```
+	It make an AMI with packer after building app.
+
 	ex) http://54.219.182.238:8080/job/build-app/configure
 	- Project Name: build-app
 	- Git Repository URL: https://github.com/doohee323/tz-terraform-jenkins.git
@@ -57,6 +59,8 @@
 
 ## 4. run terraform-apply in jenkins
 ```
+	It deploy the app to the instance(s) with terraform.
+
 	ex) http://54.219.182.238:8080/job/terraform-apply/configure
 	- Project Name: terraform-apply
 	- Git Repository URL: https://github.com/doohee323/tz-terraform-jenkins.git
