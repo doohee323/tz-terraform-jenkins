@@ -28,7 +28,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>cd ${WORKSPACE}/packer-build
+      <command>cd ${WORKSPACE}/build-app
 bash jenkins-terraform.sh</command>
     </hudson.tasks.Shell>
   </builders>
