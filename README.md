@@ -13,30 +13,31 @@
 
 ```
 
-## 1. make a working vm in vagrant
+## 1. vagrant up
 ```
-	scripts/install.sh
-	
-	install terraform, packer etc
+	cd tz-terraform-jenkins
+	vagrant up
+
+	It does these steps
+	1) make a working vm in vagrant
+		scripts/install.sh
+		install terraform, packer etc
+
+	2) make jenkins env.
+		scripts/build_jenkins.sh
+		- make aws credentials
+		- make a ssh key
+		- make a jenkins instance in aws
+		- make two jenkins projects
+
+	Get jenkins url like this, http://54.219.182.238:8080
 
 ```
 
-## 2. make jenkins env.
-```
-	scripts/build_jenkins.sh
-
-	- make aws credentials
-	- make a ssh key
-	- make a jenkins instance in aws
-	- make two jenkins projects
-
-	ex) http://54.219.182.238:8080
-
-```
-
-## 3. run packer-build in jenkins
+## 2. run packer-build in jenkins
 ```
 	It make an AMI with packer after building app.
+	Run this project After setting like this,
 
 	ex) http://54.219.182.238:8080/job/packer-build/configure
 	- Project Name: packer-build
@@ -58,16 +59,17 @@
 	$> terraform init
 ```
 
-## 4. fix backend.tf in vagrant
+## 3. fix backend.tf in vagrant
 ```
 	It should be run in vagrant.
 	vagrant ssh
 	sudo bash /vagrant/jenkins-env/scripts/backend.sh
 ```
 
-## 5. run terraform-apply in jenkins
+## 4. run terraform-apply in jenkins
 ```
 	It deploy the app to the instance(s) with terraform.
+	Run this project After setting like this,
 
 	ex) http://54.219.182.238:8080/job/terraform-apply/configure
 	- Project Name: terraform-apply
@@ -76,6 +78,9 @@
 	- Build > Execute shell > Command
 		cd ${WORKSPACE}/jenkins-env/scripts
 		bash jenkins-run-terraform.sh
+
+	Get the app url.
+
 ```
 
 ## * destroy aws resources
