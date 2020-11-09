@@ -1,6 +1,9 @@
 #!/bin/bash
 set -ex
 
+## cd jenkins-env
+cd ..
+
 AWS_REGION="us-west-1"
 
 S3_BUCKET=`aws s3 ls --region $AWS_REGION |grep terraform-state |tail -n1 |cut -d ' ' -f3`

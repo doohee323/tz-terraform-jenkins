@@ -7,29 +7,11 @@ cd ../jenkins-env
 ############################################################
 # make aws credentials
 ############################################################
-if [ ! -f "/home/vagrant/.aws/credentials" ]; then
+if [ ! -f "/home/vagrant/.aws/config" ]; then
 
-	echo aws credentials?
-	read -p 'aws_access_key_id: ' aws_access_key_id
-	read -sp 'aws_secret_access_key: ' aws_secret_access_key
-	echo aws region: us-west-1 
-	echo
-	
 	mkdir -p /home/vagrant/.aws
-	
-	echo '[default]
-	aws_access_key_id = AWS_KEY_ID
-	aws_secret_access_key = AWS_SECRET_KEY 
-	' > /home/vagrant/.aws/credentials
-	
-	sed -i "s|AWS_KEY_ID|${aws_access_key_id}|g" /home/vagrant/.aws/credentials
-	sed -i "s|AWS_SECRET_KEY|${aws_secret_access_key}|g" /home/vagrant/.aws/credentials
-	
-	echo '[default]
-	region = us-west-1
-	output = json
-	' > /home/vagrant/.aws/config
-	
+	cp -Rf /vagrant/jenkins-env/resource/aws/config /home/vagrant/.aws/config
+	cp -Rf /vagrant/jenkins-env/resource/aws/credentials /home/vagrant/.aws/credentials
 	chown -Rf vagrant:vagrant /home/vagrant/.aws
 	chmod -Rf 600 /home/vagrant/.aws
 	
@@ -38,6 +20,7 @@ if [ ! -f "/home/vagrant/.aws/credentials" ]; then
 	chmod -Rf 600 /root/.aws
 	
 	random_str=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-6} | head -n 1`
+	echo aws s3api create-bucket --bucket terraform-state-${random_str} --region us-west-1
 	aws s3api create-bucket --bucket terraform-state-${random_str} --region us-west-1
 
 fi 
@@ -59,9 +42,9 @@ rm -Rf backend.tf
 terraform init
 terraform apply -auto-approve
 
-s3_bucket_id=`terraform output | grep s3-bucket | awk '{print $3}'`
+export s3_bucket_id=`terraform output | grep s3-bucket | awk '{print $3}'`
 jenkins_ip=`terraform output | grep -A 2 "jenkins-ip" | tail -n 1`
-jenkins_ip=`echo $jenkins_ip | sed -e 's/\"//g;s/ //;s/,//'`
+export jenkins_ip=`echo $jenkins_ip | sed -e 's/\"//g;s/ //;s/,//'`
 
 echo '
 Host JENKINS_IP
@@ -76,8 +59,8 @@ cp -Rf backend.tf_imsi  backend.tf
 #sed -i "s|XXXX|${s3_bucket_id}|g" backend.tf
 terraform init
 
-echo "wait 60 seconds."
-sleep 60
+echo "wait 2 minutes."
+sleep 240
 
 ############################################################
 ## make two jenkins projects
@@ -96,11 +79,18 @@ ssh -i mykey ubuntu@${jenkins_ip} "sudo service jenkins restart"
 
 jenkins_key=`ssh -i mykey ubuntu@${jenkins_ip} "sudo cat /var/lib/jenkins/secrets/initialAdminPassword"`
 
-echo ############################################################
-echo $s3_bucket_id
-echo $jenkins_ip
+echo "##[ Summary ]##########################################################"
+echo "s3_bucket_id:" $s3_bucket_id
+echo "jenkins_ip:" $jenkins_ip
 echo "Jenkins url: http://${jenkins_ip}:8080/"
+echo "copy and paste this jenkins_key in the Jenkins url."
 echo "jenkins_key: ${jenkins_key}"
+echo ""
+echo "Access to aws ec2 in /vagrant/jenkins-env"
 echo "ssh -i mykey ubuntu@${jenkins_ip}"
-echo ############################################################
+echo ""
+echo "Now just run these projects in jenkins like in README.md."
+echo "3. run packer-build in jenkins"
+echo "4. run terraform-apply in jenkins"
+echo "#######################################################################"
 

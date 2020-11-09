@@ -1,9 +1,15 @@
 # tz-terraform-jenkins
 
-## 0. make an aws user
+## 0. Prep
 ```
+	-. make an aws user
 	ex) 
 	terraform-user with terraform-administrator group
+
+	-. set aws configuration
+	vi jenkins-env/resource/aws/config
+	vi jenkins-env/resource/aws/credentials
+
 ```
 
 ## 1. make a working vm in vagrant
@@ -30,14 +36,15 @@
 ## 3. run packer-build in jenkins
 ```
 	ex) http://54.219.182.238:8080/job/packer-build/configure
-	packer-build
-	https://github.com/doohee323/tz-terraform-jenkins.git
-	cd ${WORKSPACE}/packer-build
-	bash jenkins-terraform.sh
-```
+	- Project Name: packer-build
+	- Git Repository URL: https://github.com/doohee323/tz-terraform-jenkins.git
+	- Branches to build: */main
+	- Build > Execute shell > Command
+		cd ${WORKSPACE}/packer-build
+		bash jenkins-terraform.sh
 
-## 4. uncomment backend.tf and rename bucket from terraform output
-```
+    # fyi, shells run this automatically,
+	# uncomment backend.tf and rename bucket from terraform output
 	terraform {
 	  backend "s3" {
 	    bucket = "XXXX"
@@ -48,15 +55,16 @@
 	$> terraform init
 ```
 
-## 5. run terraform-apply
+## 4. run terraform-apply in jenkins
 ```
 	ex) http://54.219.182.238:8080/job/terraform-apply/configure
-	terraform-apply
-	https://github.com/doohee323/tz-terraform-jenkins.git
-	cd ${WORKSPACE}/jenkins-env/scripts
-	bash jenkins-run-terraform.sh
+	- Project Name: terraform-apply
+	- Git Repository URL: https://github.com/doohee323/tz-terraform-jenkins.git
+	- Branches to build: */main
+	- Build > Execute shell > Command
+		cd ${WORKSPACE}/jenkins-env/scripts
+		bash jenkins-run-terraform.sh
 ```
-
 
 ## * destroy aws resources
 ```

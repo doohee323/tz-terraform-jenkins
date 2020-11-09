@@ -7,3 +7,6 @@ terraform.tfstate.backup
 .terraform
 mykey*
 print.out
+.terraform.tfstate.lock.info
+jenkins-env/resource/aws/*
+
