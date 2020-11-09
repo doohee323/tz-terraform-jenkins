@@ -38,7 +38,7 @@
 	ex) http://54.219.182.238:8080/job/build-app/configure
 	- Project Name: build-app
 	- Git Repository URL: https://github.com/doohee323/tz-terraform-jenkins.git
-	- Branches to build: */main
+	- Branches to build: */master
 	- Build > Execute shell > Command
 		cd ${WORKSPACE}/build-app
 		bash jenkins-terraform.sh
@@ -60,7 +60,7 @@
 	ex) http://54.219.182.238:8080/job/terraform-apply/configure
 	- Project Name: terraform-apply
 	- Git Repository URL: https://github.com/doohee323/tz-terraform-jenkins.git
-	- Branches to build: */main
+	- Branches to build: */master
 	- Build > Execute shell > Command
 		cd ${WORKSPACE}/jenkins-env/scripts
 		bash jenkins-run-terraform.sh
