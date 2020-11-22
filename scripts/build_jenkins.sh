@@ -2,7 +2,7 @@
 
 #set -x
 
-cd ../jenkins-env
+cd /vagrant/jenkins-env
 
 ############################################################
 # make aws credentials
@@ -10,31 +10,34 @@ cd ../jenkins-env
 if [ ! -f "/home/vagrant/.aws/config" ]; then
 
 	mkdir -p /home/vagrant/.aws
-	cp -Rf /vagrant/jenkins-env/resource/aws/config /home/vagrant/.aws/config
-	cp -Rf /vagrant/jenkins-env/resource/aws/credentials /home/vagrant/.aws/credentials
+	sudo cp -Rf /vagrant/jenkins-env/resource/aws/config /home/vagrant/.aws/config
+	sudo cp -Rf /vagrant/jenkins-env/resource/aws/credentials /home/vagrant/.aws/credentials
 	chown -Rf vagrant:vagrant /home/vagrant/.aws
-	chmod -Rf 600 /home/vagrant/.aws
+	chmod -Rf 600 /home/vagrant/.aws/*
 	
 	rm -Rf /root/.aws
 	cp -Rf /home/vagrant/.aws /root/.aws
-	chmod -Rf 600 /root/.aws
-	
-	random_str=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-6} | head -n 1`
+	chmod -Rf 600 /root/.aws.aws/*
+
+	LC_ALL=C;
+	random_str=`cat /dev/urandom | tr -dc 'a-z0-9' | fold -w ${1:-6} | head -n 1`
 	echo aws s3api create-bucket --bucket terraform-state-${random_str} --region us-west-1
-	aws s3api create-bucket --bucket terraform-state-${random_str} --region us-west-1
+	aws s3api create-bucket \
+	  --bucket terraform-state-${random_str} \
+	  --region us-west-1 \
+	  --create-bucket-configuration LocationConstraint=us-west-1
+fi
 
-fi 
-
-rm -Rf .terraform
-rm -Rf terraform.tfstate
-rm -Rf terraform.tfstate.backup
+sudo rm -Rf .terraform
+sudo rm -Rf terraform.tfstate
+sudo rm -Rf terraform.tfstate.backup
+sudo rm -Rf mykey
+sudo rm -Rf backend.tf
 
 ############################################################
 ## make a ssh key
 ############################################################
 ssh-keygen -t rsa -C mykey -P "" -f mykey -q
-
-rm -Rf backend.tf
 
 ############################################################
 ## make a jenkins instance in aws
@@ -58,6 +61,8 @@ sed -i "s|JENKINS_IP|${jenkins_ip}|g" ~/.ssh/config
 cp -Rf backend.tf_imsi  backend.tf
 #sed -i "s|XXXX|${s3_bucket_id}|g" backend.tf
 terraform init
+
+echo "ssh -i mykey ubuntu@${jenkins_ip}"
 
 echo "Wait about 2 minutes."
 sleep 200

@@ -4,19 +4,26 @@
 ```
 	-. make an aws user
 	ex) 
+    make a group as terraform-administrator with AdministratorAccess
+    make an Programmatic access user as terraform with terraform-administrator
 	terraform-user with terraform-administrator group
 
 	-. set aws configuration
 	cf. This env. works only in us-west-1.
 	vi jenkins-env/resource/aws/config
+        [default]
+        region = us-west-1
+        output = json
 	vi jenkins-env/resource/aws/credentials
-
+        [default]
+        aws_access_key_id = xxx
+        aws_secret_access_key = xxx
 ```
 
 ## 1. vagrant up
 ```
 	cd tz-terraform-jenkins
-	vagrant up
+	vagrant up  # as vagrant user
 
 	It does these steps
 	1) make a working vm in vagrant
@@ -31,12 +38,11 @@
 		- make two jenkins projects
 
 	Get jenkins url like this, http://54.219.182.238:8080
-
 ```
 
 ## 2. run packer-build in jenkins
 ```
-	It make an AMI with packer after building app.
+	It makes an AMI with packer after building app.
 	Run this project After setting like this,
 
 	ex) http://54.219.182.238:8080/job/packer-build/configure
@@ -80,18 +86,11 @@
 		bash jenkins-run-terraform.sh
 
 	Get the app url.
-
 ```
 
 ## * destroy aws resources
 ```
 	vagrant ssh
-	sudo su
-	cd /vagrant/jenkins-env
-	terraform destroy
-	
-	Need to delete s3 bucket and AMI manually or might need to remove these,
-	- mykeypair in Key pairs
-	- jenkins-role in IAM Roles
-
+    cd /vagrant/scripts
+    bash remove_jenkins.sh
 ```

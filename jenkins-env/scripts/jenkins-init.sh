@@ -30,7 +30,8 @@ echo "deb http://pkg.jenkins.io/debian-stable binary/" >> /etc/apt/sources.list
 apt-get update
 
 # install dependencies
-apt-get install -y python3 openjdk-11-jdk awscli
+#apt-get install -y python3 openjdk-11-jdk awscli
+apt-get install -y python3 openjdk-8-jre awscli
 # install jenkins
 apt-get install -y jenkins=${JENKINS_VERSION} unzip
 
